@@ -58,7 +58,7 @@ int main(int argc, char* argv[]) {
 	cudaMalloc((void **) &dev_d, nblocks*sizeof(int));
 	int mmm=0;
 	for( i = 0 ; i < N ; i++) {
-		a[i] = rand()% 100;
+		a[i] = rand()% N;
 		// printf("%d ",a[i]);
 		if(mmm<a[i]) 
 			mmm=a[i];
@@ -73,9 +73,9 @@ int main(int argc, char* argv[]) {
 
 	printf("cpu max %d, gpu_max = %d\n\n",mmm,d[0]);
 
-	for (i = 0; i < nblocks; i++)
-		printf("%d ", d[i]);
-	printf("\n");
+	// for (i = 0; i < nblocks; i++)
+	// 	printf("%d ", d[i]);
+	// printf("\n");
 
 	cudaFree(dev_a);
 	cudaFree(dev_d);
