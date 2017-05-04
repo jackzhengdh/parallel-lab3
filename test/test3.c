@@ -16,9 +16,15 @@ int main(void) {
 	cudaMalloc((void **)&d_c, size);
 
 	// Alloc space for host copies of a, b, c and setup input values
-	a = (int *)malloc(size); random_ints(a, N);
-	b = (int *)malloc(size); random_ints(b, N);
+	a = (int *)malloc(size);
+	b = (int *)malloc(size);
 	c = (int *)malloc(size);
+
+	for (i = 0; i < size; i++) {
+		a[i] = rand() % size;
+		b[i] = rand() % size;
+		// printf("%d\n", a[i]);
+	}
 	// Copy inputs to device
 	cudaMemcpy(d_a, a, size, cudaMemcpyHostToDevice);
 	cudaMemcpy(d_b, b, size, cudaMemcpyHostToDevice);
