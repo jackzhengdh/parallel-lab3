@@ -56,7 +56,7 @@ int main() {
 
 	cudaMemcpy(dev_a , a, N*sizeof(int),cudaMemcpyHostToDevice);
 
-	kernel_min < < < nblocks,tbp > > >(dev_a,dev_d);
+	kernel_min<<<nblocks, tbp>>>(dev_a, dev_d);
 
 	cudaMemcpy(d, dev_d, nblocks*sizeof(int),cudaMemcpyDeviceToHost);
 
