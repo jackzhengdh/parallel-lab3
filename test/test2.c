@@ -14,7 +14,7 @@ __global__ void getmaxcu(unsigned int *nums, unsigned int *max, int *mutex, int 
 	unsigned int stride = gridDim.x * blockDim.x;
 	unsigned int offset = 0;
 
-	unsigned int temp = -1;
+	unsigned int temp = 0;
 
 	while (i + offset < N) {
 		if (temp < nums[i + offset])
