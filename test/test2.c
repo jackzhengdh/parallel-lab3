@@ -68,6 +68,10 @@ int main(int argc, char* argv[]) {
 
 	printf("cpu max %d, gpu_max = %d",mmm,d[0]);
 
+	for (i = 0; i < nblocks; i++)
+		printf("%d ", d[i]);
+	printf("\n", );
+
 	cudaFree(dev_a);
 	cudaFree(dev_d);
 
