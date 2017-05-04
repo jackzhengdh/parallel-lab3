@@ -82,6 +82,7 @@ int main(int argc, char *argv[]) {
 		printf("Calling getmaxcu\n");
 		getmaxcu<<<nblocks, tpb>>>(dev_num, dev_out, N);
 		cudaMemcpy(output, dev_out, nblocks*sizeof(unsigned int), cudaMemcpyDeviceToHost);
+		printf("cpu max = %u, gpu max = %u\n", max, output[0]);
 
 		N = sizeof(output) / sizeof(output[0]);
 		nblocks = N / tpb + 1;
@@ -100,7 +101,6 @@ int main(int argc, char *argv[]) {
 
 	}
 
-	printf("cpu max = %u, gpu max = %u\n", max, output[0]);
 
 
 }
