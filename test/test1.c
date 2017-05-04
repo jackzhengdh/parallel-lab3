@@ -82,19 +82,19 @@ int main(int argc, char *argv[]) {
 	// printf("Entering while loop\n");
 
 	while (1) {
-		printf("nblocks = %d\n", nblocks);
+		// printf("nblocks = %d\n", nblocks);
 		// printf("Inside while loop, iteration\n");
 		cudaMemcpy(dev_num, nums, N*sizeof(unsigned int), cudaMemcpyHostToDevice);
-		printf("Calling getmaxcu\n");
+		// printf("Calling getmaxcu\n");
 		// int threads = tpb;
 		// if (threads > N)
 			// threads = N;
 		getmaxcu<<<nblocks, tpb>>>(dev_num, dev_out, N);
 		cudaMemcpy(output, dev_out, nblocks*sizeof(unsigned int), cudaMemcpyDeviceToHost);
 	
-		for (i = 0; i < nblocks; i++)
-			printf("%u \n", output[i]);
-		printf("\n");
+		// for (i = 0; i < nblocks; i++)
+		// 	printf("%u \n", output[i]);
+		// printf("\n");
 				
 		if (nblocks == 1) {
 			printf("cpu max = %u, gpu max = %u\n", max, output[0]);
@@ -109,10 +109,10 @@ int main(int argc, char *argv[]) {
 		free(nums);
 		nums = (unsigned int *)malloc(N * sizeof(unsigned int));
 		memcpy(nums, output, N*sizeof(unsigned int));
-		printf("Checking content of nums:\n");
-		for (i = 0; i < N; i++)
-			printf("%u \n", nums[i]);
-		printf("\n");
+		// printf("Checking content of nums:\n");
+		// for (i = 0; i < N; i++)
+		// 	printf("%u \n", nums[i]);
+		// printf("\n");
 				
 		free(output);
 		output = (unsigned int *)malloc(nblocks * sizeof(unsigned int));
