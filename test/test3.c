@@ -20,6 +20,7 @@ int main(void) {
 	b = (int *)malloc(size);
 	c = (int *)malloc(size);
 
+	int i;
 	for (i = 0; i < size; i++) {
 		a[i] = rand() % size;
 		b[i] = rand() % size;
@@ -35,7 +36,7 @@ int main(void) {
 	// Copy result back to host
 	cudaMemcpy(c, d_c, size, cudaMemcpyDeviceToHost);
 
-	int i;
+	
 	printf("%5s %5s %5s\n", "a[]", "b[]", "c[]");
 	for (i = 0; i < size; i++)
 		printf("%5d %5d %5d\n", a[i], b[i], c[i]);
