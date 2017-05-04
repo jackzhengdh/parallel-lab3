@@ -11,11 +11,14 @@ __global__ void getmaxcu(unsigned int *nums, unsigned int *output, int N) {
 	unsigned int tid = threadIdx.x;
 	unsigned int i = blockIdx.x * blockDim.x + threadIdx.x;
 
-	if (i < N)
-		sdata[tid] = nums[i];
+	unsigned int temp = 0;
 
+	if (i < N) {
+		if (temp < nums[i])
+			temp = nums[i];
+	}
+	sdata[tid] = temp;
 	__syncthreads();
-
 
 	for(unsigned int s=tpb/2 ; s >= 1 ; s=s/2) {
 		if(tid < s) {
