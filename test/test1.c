@@ -28,11 +28,12 @@ __global__ void getmaxcu(unsigned int *nums, unsigned int *output, int N) {
 
 int main(int argc, char *argv[]) {
 	printf("Starting main function\n");
-	unsigned int N;
-	unsigned int i;
+	int i;
+	int N;
+	int nblocks;
 	unsigned int *nums;
 	unsigned int *output;
-	unsigned int nblocks;
+	
 
 	if (argc != 2) {
 		printf("Error: input 1 number as size of array");
@@ -88,11 +89,15 @@ int main(int argc, char *argv[]) {
 		cudaFree(dev_out);
 		cudaFree(dev_num);
 		free(nums);
-		free(output);
 		nums = (unsigned int *)malloc(N * sizeof(unsigned int));
+		memcpy(nums, output, sizeof(output));
+		free(output);
 		output = (unsigned int *)malloc(nblocks * sizeof(unsigned int));
 		cudaMalloc((void **) &dev_num, N * sizeof(unsigned int));
 		cudaMalloc((void **) &dev_out, nblocks * sizeof(unsigned int));
+
+		
+
 	}
 
 	printf("cpu max = %u, gpu max = %u\n", max, output[0]);
