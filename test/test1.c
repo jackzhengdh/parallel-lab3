@@ -68,8 +68,13 @@ int main(int argc, char *argv[]) {
 		// printf("%d\n", nums[i]);
 	}
 
+	printf("Entering while loop\n");
+
 	while (nblocks > 1) {
+
+		printf("Inside while loop, iteration\n");
 		cudaMemcpy(dev_num, nums, N*sizeof(unsigned int), cudaMemcpyHostToDevice);
+		printf("Calling getmaxcu\n");
 		getmaxcu<<<nblocks, tpb>>>(dev_num, dev_out, N);
 		cudaMemcpy(output, dev_out, nblocks*sizeof(unsigned int), cudaMemcpyDeviceToHost);
 
