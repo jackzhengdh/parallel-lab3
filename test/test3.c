@@ -1,3 +1,7 @@
+#include <cuda.h>
+#include <stdio.h>
+#include <time.h>
+
 #define N 20
 #define THREADS_PER_BLOCK 512
 
