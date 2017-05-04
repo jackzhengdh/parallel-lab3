@@ -16,6 +16,7 @@ __global__ void getmaxcu(unsigned int *nums, unsigned int *output, int N) {
 
 	__syncthreads();
 
+
 	for(unsigned int s=tpb/2 ; s >= 1 ; s=s/2) {
 		if(tid < s) {
 			if(sdata[tid] < sdata[tid + s])
@@ -78,7 +79,7 @@ int main(int argc, char *argv[]) {
 	// printf("Entering while loop\n");
 
 	while (1) {
-
+		printf("nblocks = %d\n", nblocks);
 		// printf("Inside while loop, iteration\n");
 		cudaMemcpy(dev_num, nums, N*sizeof(unsigned int), cudaMemcpyHostToDevice);
 		printf("Calling getmaxcu\n");
@@ -97,9 +98,9 @@ int main(int argc, char *argv[]) {
 		for (i = 0; i < N; i++)
 			printf("%u \n", output[i]);
 		printf("\n");
-		
+
 		nblocks = N / tpb + 1;
-		printf("nblocks = %d\n", N);
+		// printf("nblocks = %d\n", N);
 		cudaFree(dev_out);
 		cudaFree(dev_num);
 		free(nums);
