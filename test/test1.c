@@ -109,6 +109,11 @@ int main(int argc, char *argv[]) {
 		free(nums);
 		nums = (unsigned int *)malloc(N * sizeof(unsigned int));
 		memcpy(nums, output, sizeof(output));
+		printf("Checking content of nums:\n", );
+		for (i = 0; i < nblocks; i++)
+			printf("%u \n", nums[i]);
+		printf("\n");
+				
 		free(output);
 		output = (unsigned int *)malloc(nblocks * sizeof(unsigned int));
 		cudaMalloc((void **) &dev_num, N * sizeof(unsigned int));
