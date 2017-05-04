@@ -86,25 +86,21 @@ int main(int argc, char *argv[]) {
 		// printf("Inside while loop, iteration\n");
 		cudaMemcpy(dev_num, nums, N*sizeof(unsigned int), cudaMemcpyHostToDevice);
 		printf("Calling getmaxcu\n");
-		int threads = tpb;
-		if (threads > N)
-			threads = N;
-		getmaxcu<<<nblocks, threads>>>(dev_num, dev_out, N);
+		// int threads = tpb;
+		// if (threads > N)
+			// threads = N;
+		getmaxcu<<<nblocks, tpb>>>(dev_num, dev_out, N);
 		cudaMemcpy(output, dev_out, nblocks*sizeof(unsigned int), cudaMemcpyDeviceToHost);
-		
+	
+		for (i = 0; i < nblocks; i++)
+			printf("%u \n", output[i]);
+		printf("\n");
+				
 		if (nblocks == 1) {
 			printf("cpu max = %u, gpu max = %u\n", max, output[0]);
 			break;
 		}
 
-
-
-		
-
-		for (i = 0; i < nblocks; i++)
-			printf("%u \n", output[i]);
-		printf("\n");
-		
 		N = nblocks;
 		nblocks = N / tpb + 1;
 		// printf("nblocks = %d\n", N);
