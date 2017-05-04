@@ -34,6 +34,11 @@ int main(int argc, char *argv[])
 	printf(" The maximum number in the array is: %u\n", 
 			getmax(numbers, size));
 
+	printf(" The numbers contained in the array are: \n");
+	for ( i = 0; i < size; i++)
+		printf("%d ", numbers[i]);
+	printf("\n");
+
 	free(numbers);
 	exit(0);
 }
@@ -49,10 +54,11 @@ unsigned int getmax(unsigned int num[], unsigned int size)
 	unsigned int i;
 	unsigned int max = num[0];
 
-	for(i = 1; i < size; i++)
-	if(num[i] > max)
-		max = num[i];
-
+	for(i = 1; i < size; i++) {
+		if(num[i] > max)
+			max = num[i];
+	}
+	
 	return( max );
 
 }
