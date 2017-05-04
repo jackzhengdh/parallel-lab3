@@ -2,17 +2,19 @@
 #include <stdio.h>
 #include <time.h>
 
-#define N 20
+#define n 20
 #define THREADS_PER_BLOCK 512
 
-__global__ void add(int *a, int *b, int *c) {
-	*c = *a + *b;
+__global__ void add(int *a, int *b, int *c, int n) {
+	int i = threadIdx.x + blockDim.x * blockIdx.x;
+	if (i < n)
+		d_c[i] = d_a[i] + d_b[i];
 }
 
 int main(void) {
 	int *a, *b, *c;			// host copies of a, b, c
 	int *d_a, *d_b, *d_c;		// device copies of a, b, c
-	int size = N * sizeof(int);
+	int size = n * sizeof(int);
 
 	printf("Strating cudaMalloc\n");
 	// Alloc space for device copies of a, b, c
@@ -45,7 +47,7 @@ int main(void) {
 
 	printf("Executing kernal function add\n");
 	// Launch add() kernel on GPU
-	add<<<N/THREADS_PER_BLOCK,THREADS_PER_BLOCK>>>(d_a, d_b, d_c);
+	add<<<N/THREADS_PER_BLOCK,THREADS_PER_BLOCK>>>(d_a, d_b, d_c, size);
 	printf("Completed executing kernal function add\n");
 
 	printf("Copying data from device to host\n");
