@@ -68,13 +68,14 @@ int main(int argc, char *argv[]) {
 		// printf("%d\n", nums[i]);
 	}
 
-	while (N > 1) {
+	while (nblocks > 1) {
 		cudaMemcpy(dev_num, nums, N*sizeof(unsigned int), cudaMemcpyHostToDevice);
 		getmaxcu<<<nblocks, tpb>>>(dev_num, dev_out, N);
 		cudaMemcpy(output, dev_out, nblocks*sizeof(unsigned int), cudaMemcpyDeviceToHost);
 
 		N = sizeof(output) / sizeof(output[0]);
 		nblocks = N / tpb + 1;
+		printf("nblocks = %d\n", N);
 		cudaFree(dev_out);
 		cudaFree(dev_num);
 		free(nums);
