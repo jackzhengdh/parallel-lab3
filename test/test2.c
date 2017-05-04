@@ -8,19 +8,30 @@ __global__ void getmaxcu(unsigned int *nums, unsigned int *max, int *mutex, int 
 
 	__shared__ int sdata[tpb];
 
-	unsigned int tid = threadIdx.x;
-	unsigned int i = blockIdx.x * blockDim.x + threadIdx.x;
+	int tid = threadIdx.x;
+	int i = blockIdx.x * blockDim.x + threadIdx.x;
 
-	unsigned int temp = 0;
+	unsigned int stride = gridDim.x * blockDim.x;
+	unsigned int offset = 0;
 
-	if (i < N) {
-		if (temp < nums[i])
-			temp = nums[i];
+	unsigned int temp = -1;
+
+	while (i + offset < N) {
+		if (temp < nums[i + offset])
+			temp = nums[i + offset];
+		offset += stride;
 	}
 	sdata[tid] = temp;
+
+
+	// if (i < N) {
+	// 	if (temp < nums[i])
+	// 		temp = nums[i];
+	// }
+	// sdata[tid] = temp;
 	__syncthreads();
 
-	for(unsigned int s=tpb/2 ; s >= 1 ; s=s/2) {
+	for(int s=tpb/2 ; s >= 1 ; s=s/2) {
 		if(tid < s) {
 			if(sdata[tid] < sdata[tid + s])
 				sdata[tid] = sdata[tid + s];
@@ -79,7 +90,7 @@ int main(int argc, char *argv[]) {
 
 	cudaMemcpy(dev_num, nums, N*sizeof(unsigned int), cudaMemcpyHostToDevice);
 	getmaxcu<<<nblocks, tpb>>>(dev_num, dev_out, dev_mutex, N);
-	cudaMemcpy(output, dev_out, nblocks*sizeof(unsigned int), cudaMemcpyDeviceToHost);
+	cudaMemcpy(output, dev_out, sizeof(unsigned int), cudaMemcpyDeviceToHost);
 	
 	printf("The maximum number in the array is: %u\n", output[0]);
 		
