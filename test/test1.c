@@ -16,12 +16,10 @@ __global__ void getmaxcu(unsigned int *nums, unsigned int *output, int N) {
 
 	__syncthreads();
 
-	for(unsigned int s=tpb/2 ; s >= 1 ; s=s/2) {
-		if(tid < s) {
-			if(sdata[tid] < sdata[tid + s])
-				sdata[tid] = sdata[tid + s];
-		}
-		__syncthreads();
+
+	if (sdata[0] > sdata[tid]) {
+		sdata[0] = sdata[tid];
+		__syncthreads;
 	}
 
 	if(tid == 0)
@@ -42,12 +40,15 @@ int main(int argc, char *argv[]) {
 	}
 
 	N = atol(argv[1]);
+
+	printf("Starting malloc\n");
 	nums = (unsigned int *)malloc(N * sizeof(unsigned int));
 	if (!nums) {
 		printf("Unable to allocate mem for nums of size %u\n", N);
 		exit(1);
 	}
 	
+
 	nblocks = N / tpb + 1;
 	output = (unsigned int *)malloc(nblocks * sizeof(unsigned int));
 	if (!output) {
@@ -60,7 +61,7 @@ int main(int argc, char *argv[]) {
 	cudaMalloc((void **) &dev_out, nblocks * sizeof(unsigned int));
 
 	printf("Completed cudaMalloc\n");
-	
+
 	unsigned int max = 0;
 
 	srand(time(NULL));
