@@ -68,17 +68,25 @@ int main(int argc, char *argv[]) {
 		// printf("%d\n", nums[i]);
 	}
 
-	cudaMemcpy(dev_num, nums, N*sizeof(unsigned int), cudaMemcpyHostToDevice);
+	while (N > 1) {
+		cudaMemcpy(dev_num, nums, N*sizeof(unsigned int), cudaMemcpyHostToDevice);
+		getmaxcu<<<nblocks, tpb>>>(dev_num, dev_out, N);
+		cudaMemcpy(output, dev_out, nblocks*sizeof(unsigned int), cudaMemcpyDeviceToHost);
 
-	getmaxcu<<<nblocks, tpb>>>(dev_num, dev_out, N);
-
-	cudaMemcpy(output, dev_out, nblocks*sizeof(unsigned int), cudaMemcpyDeviceToHost);
+		N = sizeof(output) / sizeof(output[0]);
+		nblocks = N / tpb + 1;
+		cudaFree(dev_out);
+		cudaFree(dev_num);
+		free(nums);
+		free(output);
+		nums = (unsigned int *)malloc(N * sizeof(unsigned int));
+		output = (unsigned int *)malloc(nblocks * sizeof(unsigned int));
+		cudaMalloc((void **) &dev_num, N * sizeof(unsigned int));
+		cudaMalloc((void **) &dev_out, nblocks * sizeof(unsigned int));
+	}
 
 	printf("cpu max = %u, gpu max = %u\n", max, output[0]);
 
-	cudaFree(dev_out);
-	cudaFree(dev_num);
-	free(nums);
-	free(output);
+
 }
 
