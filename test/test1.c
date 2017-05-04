@@ -4,7 +4,7 @@
 
 #define tpb 1024
 
-__global__ void getmaxcu(int *nums, int *output, int N) {
+__global__ void getmaxcu(unsigned int *nums, unsigned int *output, int N) {
 
 	__shared__ int sdata[tpb];
 
@@ -12,7 +12,7 @@ __global__ void getmaxcu(int *nums, int *output, int N) {
 	unsigned int i = blockIdx.x * blockDim.x + threadIdx.x;
 
 	if (i < N)
-		sdata[tid] = a[i];
+		sdata[tid] = nums[i];
 
 	__syncthreads();
 
@@ -25,7 +25,7 @@ __global__ void getmaxcu(int *nums, int *output, int N) {
 	}
 
 	if(tid == 0)
-		d[blockIdx.x] = sdata[0];
+		output[blockIdx.x] = sdata[0];
 }
 
 int main(int argc, char *argv[]) {
