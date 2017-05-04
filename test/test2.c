@@ -6,7 +6,7 @@
 #include <time.h>
 
 #define tbp 512
-#define nblocks 10
+
 __global__ void kernel_min(int *a, int *d, int N) {
 
 	__shared__ int sdata[tbp]; //"static" shared memory
@@ -39,6 +39,8 @@ int main(int argc, char* argv[]) {
 	const int N = atol(argv[1]);
 
 	int i;
+	int nblocks;
+	nblocks = N / tbp + 1;
 	// const int N=tbp*nblocks;
 	srand(time(NULL));
 
@@ -66,11 +68,11 @@ int main(int argc, char* argv[]) {
 
 	cudaMemcpy(d, dev_d, nblocks*sizeof(int),cudaMemcpyDeviceToHost);
 
-	printf("cpu max %d, gpu_max = %d",mmm,d[0]);
+	printf("cpu max %d, gpu_max = %d\n\n",mmm,d[0]);
 
 	for (i = 0; i < nblocks; i++)
 		printf("%d ", d[i]);
-	printf("\n", );
+	printf("\n");
 
 	cudaFree(dev_a);
 	cudaFree(dev_d);
