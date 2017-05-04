@@ -1,10 +1,9 @@
 
 // test sample code
 
-#include < cuda.h >
-#include < stdio.h >
-#include < time.h >
-
+#include <cuda.h>
+#include <stdio.h>
+#include <time.h>
 
 #define tbp 512
 #define nblocks 1
@@ -49,28 +48,24 @@ int main() {
 	int mmm=0;
 	for( i = 0 ; i < N ; i++) {
 		a[i] = rand()% 100 + 5;
-		printf("%d 
-		",a[i]);
+		printf("%d ",a[i]);
 		if(mmm<a[i]) 
 			mmm=a[i];
 	}
 	printf("");
-	printf("");
-	printf("");
-	printf("");
+
 	cudaMemcpy(dev_a , a, N*sizeof(int),cudaMemcpyHostToDevice);
 
 	kernel_min < < < nblocks,tbp > > >(dev_a,dev_d);
 
 	cudaMemcpy(d, dev_d, nblocks*sizeof(int),cudaMemcpyDeviceToHost);
 
-	printf("cpu max %d, gpu_max = %d
-	",mmm,d[0]);
+	printf("cpu max %d, gpu_max = %d",mmm,d[0]);
 
 	cudaFree(dev_a);
 	cudaFree(dev_d);
 
-	printf("");
+	printf("\n");
 
 	return 0;
 }
