@@ -16,10 +16,12 @@ __global__ void getmaxcu(unsigned int *nums, unsigned int *output, int N) {
 
 	__syncthreads();
 
-
-	if (sdata[0] > sdata[tid]) {
-		sdata[0] = sdata[tid];
-		__syncthreads;
+	for(unsigned int s=tpb/2 ; s >= 1 ; s=s/2) {
+		if(tid < s) {
+			if(sdata[tid] < sdata[tid + s])
+				sdata[tid] = sdata[tid + s];
+		}
+		__syncthreads();
 	}
 
 	if(tid == 0)
@@ -75,14 +77,18 @@ int main(int argc, char *argv[]) {
 
 	printf("Entering while loop\n");
 
-	while (nblocks > 1) {
+	while (1) {
 
 		printf("Inside while loop, iteration\n");
 		cudaMemcpy(dev_num, nums, N*sizeof(unsigned int), cudaMemcpyHostToDevice);
 		printf("Calling getmaxcu\n");
 		getmaxcu<<<nblocks, tpb>>>(dev_num, dev_out, N);
 		cudaMemcpy(output, dev_out, nblocks*sizeof(unsigned int), cudaMemcpyDeviceToHost);
-		printf("cpu max = %u, gpu max = %u\n", max, output[0]);
+		
+		if (nblocks == 1) {
+			printf("cpu max = %u, gpu max = %u\n", max, output[0]);
+			break;
+		}
 
 		N = sizeof(output) / sizeof(output[0]);
 		nblocks = N / tpb + 1;
@@ -96,9 +102,6 @@ int main(int argc, char *argv[]) {
 		output = (unsigned int *)malloc(nblocks * sizeof(unsigned int));
 		cudaMalloc((void **) &dev_num, N * sizeof(unsigned int));
 		cudaMalloc((void **) &dev_out, nblocks * sizeof(unsigned int));
-
-		
-
 	}
 
 
