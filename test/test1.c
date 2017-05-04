@@ -74,7 +74,7 @@ int main(int argc, char *argv[]) {
 
 	cudaMemcpy(output, dev_out, nblocks*sizeof(unsigned int), cudaMemcpyDeviceToHost);
 
-	printf("gpu max = %u\n", output[0]);
+	printf("cpu max = %u, gpu max = %u\n", max, output[0]);
 
 	cudaFree(dev_out);
 	cudaFree(dev_num);
