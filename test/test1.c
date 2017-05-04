@@ -29,6 +29,7 @@ __global__ void getmaxcu(unsigned int *nums, unsigned int *output, int N) {
 }
 
 int main(int argc, char *argv[]) {
+	printf("Starting main function\n");
 	unsigned int N;
 	unsigned int i;
 	unsigned int *nums;
@@ -58,6 +59,8 @@ int main(int argc, char *argv[]) {
 	cudaMalloc((void **) &dev_num, N * sizeof(unsigned int));
 	cudaMalloc((void **) &dev_out, nblocks * sizeof(unsigned int));
 
+	printf("Completed cudaMalloc\n");
+	
 	unsigned int max = 0;
 
 	srand(time(NULL));
