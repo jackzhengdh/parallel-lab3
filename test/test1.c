@@ -108,9 +108,9 @@ int main(int argc, char *argv[]) {
 		cudaFree(dev_num);
 		free(nums);
 		nums = (unsigned int *)malloc(N * sizeof(unsigned int));
-		memcpy(nums, output, sizeof(output));
+		memcpy(nums, output, N);
 		printf("Checking content of nums:\n");
-		for (i = 0; i < nblocks; i++)
+		for (i = 0; i < N; i++)
 			printf("%u \n", nums[i]);
 		printf("\n");
 				
