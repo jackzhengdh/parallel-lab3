@@ -93,12 +93,13 @@ int main(int argc, char *argv[]) {
 
 
 
-		N = sizeof(output) / sizeof(output[0]);
+		
 
-		for (i = 0; i < N; i++)
+		for (i = 0; i < nblocks; i++)
 			printf("%u \n", output[i]);
 		printf("\n");
-
+		
+		N = nblocks;
 		nblocks = N / tpb + 1;
 		// printf("nblocks = %d\n", N);
 		cudaFree(dev_out);
