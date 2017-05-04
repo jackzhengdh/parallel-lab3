@@ -5,11 +5,11 @@
 #include <stdio.h>
 #include <time.h>
 
-#define tbp 512
+#define tpb 1024
 
 __global__ void kernel_min(int *a, int *d, int N) {
 
-	__shared__ int sdata[tbp]; //"static" shared memory
+	__shared__ int sdata[tpb]; //"static" shared memory
 
 	unsigned int tid = threadIdx.x;
 	unsigned int i = blockIdx.x * blockDim.x + threadIdx.x;
@@ -19,7 +19,7 @@ __global__ void kernel_min(int *a, int *d, int N) {
 
 	__syncthreads();
 	
-	for(unsigned int s=tbp/2 ; s >= 1 ; s=s/2) {
+	for(unsigned int s=tpb/2 ; s >= 1 ; s=s/2) {
 		if(tid < s) {
 			if(sdata[tid] < sdata[tid + s])
 				sdata[tid] = sdata[tid + s];
@@ -39,9 +39,12 @@ int main(int argc, char* argv[]) {
 	const int N = atol(argv[1]);
 
 	int i;
+	
 	int nblocks;
-	nblocks = N / tbp + 1;
-	// const int N=tbp*nblocks;
+
+
+	nblocks = N / tpb + 1;
+	// const int N=tpb*nblocks;
 	srand(time(NULL));
 
 	int *a;
@@ -64,7 +67,7 @@ int main(int argc, char* argv[]) {
 
 	cudaMemcpy(dev_a , a, N*sizeof(int),cudaMemcpyHostToDevice);
 
-	kernel_min<<<nblocks, tbp>>>(dev_a, dev_d, N);
+	kernel_min<<<nblocks, tpb>>>(dev_a, dev_d, N);
 
 	cudaMemcpy(d, dev_d, nblocks*sizeof(int),cudaMemcpyDeviceToHost);
 
