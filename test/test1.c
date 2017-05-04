@@ -66,8 +66,6 @@ int main(int argc, char *argv[]) {
 	cudaMalloc((void **) &dev_num, N * sizeof(unsigned int));
 	cudaMalloc((void **) &dev_out, nblocks * sizeof(unsigned int));
 
-	unsigned int max = 0;
-
 	srand(time(NULL));
 	for (i = 0; i < N; i++)
 		nums[i] = rand() % N;

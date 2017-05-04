@@ -1,24 +1,25 @@
-
-// test sample code
-
-#include <cuda.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <time.h>
 
-#define tpb 1024
+#define tpb 1024 // number of threads per block set to 1024 based on 
 
-__global__ void kernel_min(int *a, int *d, int N) {
+__global__ void getmaxcu(unsigned int *nums, unsigned int *max, int *mutex, int N) {
 
-	__shared__ int sdata[tpb]; //"static" shared memory
+	__shared__ int sdata[tpb];
 
 	unsigned int tid = threadIdx.x;
 	unsigned int i = blockIdx.x * blockDim.x + threadIdx.x;
 
-	if (i < N)
-		sdata[tid] = a[i];
+	unsigned int temp = 0;
 
+	if (i < N) {
+		if (temp < nums[i])
+			temp = nums[i];
+	}
+	sdata[tid] = temp;
 	__syncthreads();
-	
+
 	for(unsigned int s=tpb/2 ; s >= 1 ; s=s/2) {
 		if(tid < s) {
 			if(sdata[tid] < sdata[tid + s])
@@ -28,59 +29,60 @@ __global__ void kernel_min(int *a, int *d, int N) {
 	}
 
 	if(tid == 0)
-		d[blockIdx.x] = sdata[0];
+		while (atomicCAS(mutex, 0, 1) != 0);
+		if (*max < sdata[0])
+			*max = sdata[0];
+		atomicExch(mutex, 0);
 }
 
-int main(int argc, char* argv[]) {
-
-	if (argc != 2)
-		exit(1);
-
-	const int N = atol(argv[1]);
-
+int main(int argc, char *argv[]) {
 	int i;
-	
+	int N;
 	int nblocks;
+	unsigned int *nums;
+	unsigned int *output;
+	int *dev_mutex;
+	
 
+	if (argc != 2) {
+		printf("Error: input 1 number as size of array");
+		exit(1);
+	}
+
+	N = atol(argv[1]);
+
+	// printf("Starting malloc\n");
+	nums = (unsigned int *)malloc(N * sizeof(unsigned int));
+	if (!nums) {
+		printf("Unable to allocate mem for nums of size %u\n", N);
+		exit(1);
+	}
+	
 
 	nblocks = N / tpb + 1;
-	// const int N=tpb*nblocks;
-	srand(time(NULL));
-
-	int *a;
-	a = (int*)malloc(N * sizeof(int));
-	int *d;
-	d = (int*)malloc(nblocks * sizeof(int));
-
-	int *dev_a, *dev_d;
-
-	cudaMalloc((void **) &dev_a, N*sizeof(int));
-	cudaMalloc((void **) &dev_d, nblocks*sizeof(int));
-	int mmm=0;
-	for( i = 0 ; i < N ; i++) {
-		a[i] = rand()% N;
-		// printf("%d ",a[i]);
-		if(mmm<a[i]) 
-			mmm=a[i];
+	output = (unsigned int *)malloc(sizeof(unsigned int));
+	if (!output) {
+		printf("Unable to allocate mem for output of size %u\n", nblocks);
+		exit(1);
 	}
-	printf("");
 
-	cudaMemcpy(dev_a , a, N*sizeof(int),cudaMemcpyHostToDevice);
+	unsigned int *dev_num, *dev_out;
+	cudaMalloc((void **) &dev_num, N * sizeof(unsigned int));
+	cudaMalloc((void **) &dev_out, sizeof(unsigned int));
+	cudaMalloc((void **) &dev_mutex, sizeof(int));
+	cudaMemset(dev_out, 0, sizeof(unsigned int));
+	cudaMemset(dev_mutex, 0, sizeof(unsigned int));
 
-	kernel_min<<<nblocks, tpb>>>(dev_a, dev_d, N);
+	srand(time(NULL));
+	for (i = 0; i < N; i++)
+		nums[i] = rand() % N;
 
-	cudaMemcpy(d, dev_d, nblocks*sizeof(int),cudaMemcpyDeviceToHost);
+	cudaMemcpy(dev_num, nums, N*sizeof(unsigned int), cudaMemcpyHostToDevice);
+	getmaxcu<<<nblocks, tpb>>>(dev_num, dev_out, dev_mutex, N);
+	cudaMemcpy(output, dev_out, nblocks*sizeof(unsigned int), cudaMemcpyDeviceToHost);
+	
+	printf("The maximum number in the array is: %u\n", output[0]);
+		
 
-	printf("cpu max %d, gpu_max = %d\n\n",mmm,d[0]);
-
-	// for (i = 0; i < nblocks; i++)
-	// 	printf("%d ", d[i]);
-	// printf("\n");
-
-	cudaFree(dev_a);
-	cudaFree(dev_d);
-
-	printf("\n");
-
-	return 0;
 }
+
