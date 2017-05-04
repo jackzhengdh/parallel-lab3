@@ -29,7 +29,7 @@ __global__ void getmaxcu(unsigned int *nums, unsigned int *output, int N) {
 }
 
 int main(int argc, char *argv[]) {
-	printf("Starting main function\n");
+	// printf("Starting main function\n");
 	int i;
 	int N;
 	int nblocks;
@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
 
 	N = atol(argv[1]);
 
-	printf("Starting malloc\n");
+	// printf("Starting malloc\n");
 	nums = (unsigned int *)malloc(N * sizeof(unsigned int));
 	if (!nums) {
 		printf("Unable to allocate mem for nums of size %u\n", N);
@@ -63,7 +63,7 @@ int main(int argc, char *argv[]) {
 	cudaMalloc((void **) &dev_num, N * sizeof(unsigned int));
 	cudaMalloc((void **) &dev_out, nblocks * sizeof(unsigned int));
 
-	printf("Completed cudaMalloc\n");
+	// printf("Completed cudaMalloc\n");
 
 	unsigned int max = 0;
 
@@ -75,11 +75,11 @@ int main(int argc, char *argv[]) {
 		// printf("%d\n", nums[i]);
 	}
 
-	printf("Entering while loop\n");
+	// printf("Entering while loop\n");
 
 	while (1) {
 
-		printf("Inside while loop, iteration\n");
+		// printf("Inside while loop, iteration\n");
 		cudaMemcpy(dev_num, nums, N*sizeof(unsigned int), cudaMemcpyHostToDevice);
 		printf("Calling getmaxcu\n");
 		getmaxcu<<<nblocks, tpb>>>(dev_num, dev_out, N);
@@ -90,7 +90,14 @@ int main(int argc, char *argv[]) {
 			break;
 		}
 
+
+
 		N = sizeof(output) / sizeof(output[0]);
+
+		for (i = 0; i < N; i++)
+			printf("%u \n", output[i]);
+		printf("\n");
+		
 		nblocks = N / tpb + 1;
 		printf("nblocks = %d\n", N);
 		cudaFree(dev_out);
