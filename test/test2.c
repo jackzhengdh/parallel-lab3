@@ -7,14 +7,15 @@
 
 #define tbp 512
 #define nblocks 10
-__global__ void kernel_min(int *a, int *d) {
+__global__ void kernel_min(int *a, int *d, int N) {
 
 	__shared__ int sdata[tbp]; //"static" shared memory
 
 	unsigned int tid = threadIdx.x;
 	unsigned int i = blockIdx.x * blockDim.x + threadIdx.x;
 
-	sdata[tid] = a[i];
+	if (i < N)
+		sdata[tid] = a[i];
 
 	__syncthreads();
 	
@@ -30,10 +31,15 @@ __global__ void kernel_min(int *a, int *d) {
 		d[blockIdx.x] = sdata[0];
 }
 
-int main() {
+int main(int argc, char* argv[]) {
+
+	if (argc != 2)
+		exit(1);
+
+	const int N = atol(argv[1]);
 
 	int i;
-	const int N=tbp*nblocks;
+	// const int N=tbp*nblocks;
 	srand(time(NULL));
 
 	int *a;
@@ -47,7 +53,7 @@ int main() {
 	cudaMalloc((void **) &dev_d, nblocks*sizeof(int));
 	int mmm=0;
 	for( i = 0 ; i < N ; i++) {
-		a[i] = rand()% 100 + 5;
+		a[i] = rand()% 100;
 		// printf("%d ",a[i]);
 		if(mmm<a[i]) 
 			mmm=a[i];
@@ -56,7 +62,7 @@ int main() {
 
 	cudaMemcpy(dev_a , a, N*sizeof(int),cudaMemcpyHostToDevice);
 
-	kernel_min<<<nblocks, tbp>>>(dev_a, dev_d);
+	kernel_min<<<nblocks, tbp>>>(dev_a, dev_d, N);
 
 	cudaMemcpy(d, dev_d, nblocks*sizeof(int),cudaMemcpyDeviceToHost);
 
