@@ -6,7 +6,7 @@
 #include <time.h>
 
 #define tbp 512
-#define nblocks 1
+#define nblocks 10
 __global__ void kernel_min(int *a, int *d) {
 
 	__shared__ int sdata[tbp]; //"static" shared memory
@@ -48,7 +48,7 @@ int main() {
 	int mmm=0;
 	for( i = 0 ; i < N ; i++) {
 		a[i] = rand()% 100 + 5;
-		printf("%d ",a[i]);
+		// printf("%d ",a[i]);
 		if(mmm<a[i]) 
 			mmm=a[i];
 	}

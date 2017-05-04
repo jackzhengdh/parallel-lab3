@@ -5,7 +5,7 @@
 #define n 20
 #define THREADS_PER_BLOCK 512
 
-__global__ void add(int *a, int *b, int *c, int n) {
+__global__ void add(int *d_a, int *d_b, int *d_c, int n) {
 	int i = threadIdx.x + blockDim.x * blockIdx.x;
 	if (i < n)
 		d_c[i] = d_a[i] + d_b[i];
